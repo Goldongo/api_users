@@ -17,8 +17,9 @@ from passlib.context import CryptContext
 from .database import SessionLocal
 from sqlalchemy.orm import Session
 
-from .models import User
 from .schemas import Token, CreateUserRequest
+
+from . import crud, models
 
 
 # To get a string like this run:
@@ -46,7 +47,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
-    create_user_model = User(
+    create_user_model = models.User(
         username = create_user_request.username,
         display_name = create_user_request.display_name,
         hashed_password = pwd_context.hash(create_user_request.password)
@@ -72,7 +73,7 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     return Token(access_token=access_token, token_type="bearer")
 
 def authenticate_user(username: str, password: str, db):
-    user = db.query(User).filter(User.username == username).first()
+    user = crud.get_user_by_email(db, username)
     if not user:
         return False
     if not pwd_context.verify(password, user.hashed_password):

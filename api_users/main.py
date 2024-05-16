@@ -3,12 +3,13 @@
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy.orm import Session
 
-from . import models, auth
+from . import models, auth, crud
 from .auth import get_current_user
 from .database import SessionLocal, engine
 
 from typing import Annotated
-from .crud import get_user_by_id
+
+from .schemas import User
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -29,4 +30,5 @@ user_dependency = Annotated[dict, Depends(get_current_user)]
 async def user(user: user_dependency, db: db_dependency):
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication failed')
-    return {"User": user}
+    userData = crud.get_user_by_id(db, user['id'])
+    return {"User": User(username=userData.username, display_name=userData.display_name, id=userData.id)}

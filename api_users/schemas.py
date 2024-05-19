@@ -27,3 +27,15 @@ class CreateUserRequest(UserBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class Team(BaseModel):
+    id: int
+    name: str
+    player_ids: list[int]
+
+    class Config:
+        from_attributes = True # Used to be orm_mode = True
+
+class CreateTeamRequest(BaseModel):
+    name: str
+    player_ids: list[int]

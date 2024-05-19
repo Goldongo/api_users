@@ -34,7 +34,7 @@ router = APIRouter(
 )
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 def get_db():
     db = SessionLocal()
@@ -45,8 +45,8 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
+@router.post("/signup", status_code=status.HTTP_201_CREATED)
+async def signup(db: db_dependency, create_user_request: CreateUserRequest):
     user = crud.get_user_by_email(db, create_user_request.username)
     if user:
         raise HTTPException(
@@ -64,8 +64,8 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
     db.refresh(create_user_model)
     return("User " + create_user_model.username + " created sucessfully")
 
-@router.post("/token", response_model=Token)
-async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+@router.post("/login", response_model=Token)
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
                                  db: db_dependency) -> Token:
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:

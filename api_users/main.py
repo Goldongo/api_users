@@ -42,20 +42,20 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
-@app.get("/", status_code=status.HTTP_200_OK)
+@app.get("/user/me", status_code=status.HTTP_200_OK)
 async def user(user: user_dependency, db: db_dependency):
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication failed')
     return {"User": User(username=user.username, display_name=user.display_name, id=user.id)}
 
-@app.get("/team", status_code=status.HTTP_200_OK)
-async def team(user: user_dependency, db: db_dependency):
+@app.get("/user/{id}", status_code=status.HTTP_200_OK)
+async def user(id:int, user: user_dependency, db: db_dependency):
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication failed')
-    team = crud.get_user_team(db, user.id)
-    if team is None:
-        raise HTTPException(status_code=404, detail='No team found')
-    return team
+    query = crud.get_user_by_id(id)
+    if query is None:
+        raise HTTPException(status_code=404, detail='User was not found')
+    return {"User": User(username=query.username, display_name=query.display_name, id=query.id)}
 
 @app.post("/team", status_code=status.HTTP_201_CREATED)
 async def create_team(user: user_dependency, db:db_dependency, create_team_request: CreateTeamRequest):
@@ -68,3 +68,24 @@ async def create_team(user: user_dependency, db:db_dependency, create_team_reque
         raise HTTPException(status_code=422, detail='Team size must be 11')
     new_team = crud.create_team(db, user.id, create_team_request)
     return new_team
+
+@app.get("/user/me/team", status_code=status.HTTP_200_OK)
+async def team(user: user_dependency, db: db_dependency):
+    if user is None:
+        raise HTTPException(status_code=401, detail='Authentication failed')
+    team = crud.get_user_team(db, user.id)
+    if team is None:
+        raise HTTPException(status_code=404, detail='No team found')
+    return team
+
+@app.get("/user/{id}/team", status_code=status.HTTP_200_OK)
+async def get_team(id: int, user: user_dependency, db: db_dependency):
+    if user is None:
+        raise HTTPException(status_code=401, detail='Authentication failed')
+    query = crud.get_user_by_id(db, id)
+    if query is None:
+        raise HTTPException(status_code=404, detail='User was not found')
+    team = crud.get_user_team(db, id)
+    if team is None:
+        raise HTTPException(status_code=404, detail='No team found')
+    return team

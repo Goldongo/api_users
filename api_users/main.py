@@ -18,9 +18,9 @@ app = FastAPI()
 app.include_router(auth.router)
 
 origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    "http://localhost:8080",
+    "http://54.221.47.71",
+    "http://54.221.47.71:8000",
+    "http://54.221.47.71:8080",
     "*"
 ]
 

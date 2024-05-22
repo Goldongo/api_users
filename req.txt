@@ -7,3 +7,4 @@ bcrypt
 passlib[bcrypt]
 uvicorn
 pymysql
+cryptography

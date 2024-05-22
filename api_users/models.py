@@ -27,9 +27,9 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
-    username = Column(String, unique=True, index=True)
-    display_name = Column(String, unique=False, index=True)
-    hashed_password = Column(String)
+    username = Column(String(255), unique=True, index=True)
+    display_name = Column(String(255), unique=False, index=True)
+    hashed_password = Column(String(1000))
     team = relationship("Team", back_populates="user", uselist=False)
 
 
@@ -37,7 +37,7 @@ class Team(Base):
     __tablename__ = "teams"
 
     user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    name = Column(String)
+    name = Column(String(255))
     player_ids = Column(MutableList.as_mutable(JSONEncodedList))  # Store player IDs as a JSON array
 
     # Establishing a one-to-one relationship with the User table

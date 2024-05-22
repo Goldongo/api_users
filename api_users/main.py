@@ -18,9 +18,9 @@ app = FastAPI()
 app.include_router(auth.router)
 
 origins = [
-    "http://54.221.47.71",
-    "http://54.221.47.71:8000",
-    "http://54.221.47.71:8080",
+    "lb-prod-2030613354.us-east-1.elb.amazonaws.com",
+    "lb-prod-2030613354.us-east-1.elb.amazonaws.com:8000",
+    "lb-prod-2030613354.us-east-1.elb.amazonaws.com:8080",
     "*"
 ]
 

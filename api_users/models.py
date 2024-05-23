@@ -32,6 +32,9 @@ class User(Base):
     hashed_password = Column(String)
     team = relationship("Team", back_populates="user", uselist=False)
 
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class Team(Base):
     __tablename__ = "teams"
@@ -42,3 +45,6 @@ class Team(Base):
 
     # Establishing a one-to-one relationship with the User table
     user = relationship("User", back_populates="team")
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

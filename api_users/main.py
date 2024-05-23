@@ -48,6 +48,13 @@ async def health_check(db: db_dependency):
         raise HTTPException(status_code=503, detail='Could not connect to the database')
     return {"status": "healthy"}
 
+@app.get("/matchmaking", status_code=status.HTTP_200_OK)
+async def users_with_teams(user: user_dependency, db: db_dependency):
+    if user is None:
+        raise HTTPException(status_code=401, detail='Authentication failed')
+    query = crud.get_users_with_team(db, user.id)
+    return query
+
 @app.get("/user/me", status_code=status.HTTP_200_OK)
 async def user(user: user_dependency, db: db_dependency):
     if user is None:

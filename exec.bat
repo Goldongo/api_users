@@ -1,0 +1,1 @@
+uvicorn api_users.main:app --port 8000

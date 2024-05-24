@@ -42,6 +42,19 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
+@app.get("/", status_code=status.HTTP_200_OK)
+async def health_check(db: db_dependency):
+    if db is None:
+        raise HTTPException(status_code=503, detail='Could not connect to the database')
+    return {"status": "healthy"}
+
+@app.get("/matchmaking", status_code=status.HTTP_200_OK)
+async def users_with_teams(user: user_dependency, db: db_dependency):
+    if user is None:
+        raise HTTPException(status_code=401, detail='Authentication failed')
+    query = crud.get_users_with_team(db, user.id)
+    return query
+
 @app.get("/user/me", status_code=status.HTTP_200_OK)
 async def user(user: user_dependency, db: db_dependency):
     if user is None:
@@ -64,7 +77,7 @@ async def create_team(user: user_dependency, db:db_dependency, create_team_reque
     team = crud.get_user_team(db, user.id)
     if team:
         raise HTTPException(status_code=409, detail='Team already exists')
-    if len(create_team_request.player_ids) != 11:
+    if len(create_team_request.player_ids) != 11 or create_team_request.name == '':
         raise HTTPException(status_code=422, detail='Team size must be 11')
     new_team = crud.create_team(db, user.id, create_team_request)
     return new_team

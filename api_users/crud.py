@@ -30,11 +30,11 @@ def create_team(db: Session, user_id: int, create_team_request: schemas.CreateTe
 def get_users_with_team(db: Session, user_id: int, skip: int = 0, limit: int = 100):
     query = (
         db.query(models.User.id, models.User.display_name, models.Team.name)
-        .join(models.Team, models.User.id == models.Team.user_id and user_id != models.Team.user_id)
+        .join(models.Team, models.User.id == models.Team.user_id)
+        .filter(models.User.id != user_id)
         .offset(skip)
         .limit(limit)
     )
-    
     results = query.all()
     users_with_teams = []
     

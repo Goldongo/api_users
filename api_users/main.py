@@ -77,7 +77,7 @@ async def create_team(user: user_dependency, db:db_dependency, create_team_reque
     team = crud.get_user_team(db, user.id)
     if team:
         raise HTTPException(status_code=409, detail='Team already exists')
-    if len(create_team_request.player_ids) != 11:
+    if len(create_team_request.player_ids) != 11 or create_team_request.name == '':
         raise HTTPException(status_code=422, detail='Team size must be 11')
     new_team = crud.create_team(db, user.id, create_team_request)
     return new_team
